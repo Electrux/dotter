@@ -1,0 +1,103 @@
+name: dotter
+version: 0.1
+lang: c++
+std: 14
+compile_flags: -O2
+vars:
+  []
+license: bsd3
+author:
+  name: Electrux
+  email: ElectruxRedsworth@gmail.com
+libs:
+  - name: yaml-cpp
+    version: 0.6
+    inc_flags: ""
+    lib_flags: -lyaml-cpp
+  - name: filesystem
+    version: 0
+    inc_flags: ""
+    lib_flags: -L/usr/local/opt/llvm/lib -lc++fs
+builds:
+  - name: dott
+    type: bin
+    inc_flags: ""
+    lib_flags: ""
+    pre_exec: ""
+    main_src: src/main.cpp
+    other_src:
+      - src/(.*).cpp
+    exclude:
+      []
+  - name: Env_GetVarVal
+    type: test
+    inc_flags: ""
+    lib_flags: ""
+    pre_exec: ""
+    main_src: tests/Env_GetVarVal.cpp
+    other_src:
+      - src/(.*).cpp
+    exclude:
+      - src/main.cpp
+  - name: FileIO_LocExists
+    type: test
+    inc_flags: ""
+    lib_flags: ""
+    pre_exec: ""
+    main_src: tests/FileIO_LocExists.cpp
+    other_src:
+      - src/(.*).cpp
+    exclude:
+      - src/main.cpp
+  - name: Strings_Delimit
+    type: test
+    inc_flags: ""
+    lib_flags: ""
+    pre_exec: ""
+    main_src: tests/Strings_Delimit.cpp
+    other_src:
+      - src/(.*).cpp
+    exclude:
+      - src/main.cpp
+  - name: Config_LoadConfig
+    type: test
+    inc_flags: ""
+    lib_flags: ""
+    pre_exec: ""
+    main_src: tests/Config_LoadConfig.cpp
+    other_src:
+      - src/(.*).cpp
+    exclude:
+      - src/main.cpp
+  - name: Strings_IsOneOf
+    type: test
+    inc_flags: ""
+    lib_flags: ""
+    pre_exec: ""
+    main_src: tests/Strings_IsOneOf.cpp
+    other_src:
+      - src/(.*).cpp
+    exclude:
+      - src/main.cpp
+  - name: Config_CheckEnvVars
+    type: test
+    inc_flags: ""
+    lib_flags: ""
+    pre_exec: ""
+    main_src: tests/Config_CheckEnvVars.cpp
+    other_src:
+      - src/(.*).cpp
+    exclude:
+      - src/main.cpp
+  - name: Strings_ToVec
+    type: test
+    inc_flags: ""
+    lib_flags: ""
+    pre_exec: ""
+    main_src: tests/Strings_ToVec.cpp
+    other_src:
+      - src/(.*).cpp
+    exclude:
+      - src/main.cpp
+env:
+  []
