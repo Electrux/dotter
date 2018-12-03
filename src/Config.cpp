@@ -19,6 +19,7 @@
 #include "../include/Env.hpp"
 #include "../include/Config.hpp"
 
+static void FetchDirs( YAML::Node & conf, const std::string & conf_key, std::vector< std::string > & m_dirs );
 static void FetchLnks( YAML::Node & conf, const std::string & conf_key, std::vector< lnk_block > & m_lnks );
 
 bool Config::LoadConfig( const std::string & file_name )
@@ -48,19 +49,8 @@ bool Config::LoadConfig( const std::string & file_name )
 	std::cout << "Info: Loaded " << m_env_vars.size() << " env vars!\n";
 
 	// Now, fetch the directories to be created
-	if( conf[ "dirs" ] ) {
-		for( auto dir : conf[ "dirs" ] ) {
-			m_dirs.push_back( dir.as< std::string >() );
-		}
-	}
-	// sudo directories
-	if( conf[ "dirs_sudo" ] ) {
-		for( auto dir : conf[ "dirs_sudo" ] ) {
-			m_dirs_sudo.push_back( dir.as< std::string >() );
-		}
-	}
-	std::cout << "Info: Loaded " << m_dirs.size() << " required directories!\n";
-	std::cout << "Info: Loaded " << m_dirs_sudo.size() << " required directories that need sudo!\n";
+	FetchDirs( conf, "dirs", m_dirs );
+	FetchDirs( conf, "dirs_sudo", m_dirs_sudo );
 
 	// Now, retrieve the links and sudo links
 	FetchLnks( conf, "lnk", m_lnks );
@@ -114,6 +104,20 @@ bool Config::CheckEnvVars()
 		std::cerr << "\n";
 	}
 	return true;
+}
+
+static void FetchDirs( YAML::Node & conf, const std::string & conf_key, std::vector< std::string > & m_dirs )
+{
+	if( conf[ conf_key ] ) {
+		for( auto dir : conf[ conf_key ] ) {
+			m_dirs.push_back( dir.as< std::string >() );
+		}
+	}
+	std::cout << "Info: Loaded " << m_dirs.size() << " required directories";
+	if( conf_key == "dirs_sudo" ) {
+		std::cout << " that need sudo";
+	}
+	std::cout << "!\n";
 }
 
 static void FetchLnks( YAML::Node & conf, const std::string & conf_key, std::vector< lnk_block > & m_lnks )

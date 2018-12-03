@@ -33,6 +33,7 @@
 		"streambuf": "cpp",
 		"array": "cpp",
 		"cstdint": "cpp",
-		"optional": "cpp"
+		"optional": "cpp",
+		"vector": "cpp"
 	}
 }
