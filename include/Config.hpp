@@ -15,12 +15,6 @@
 #include <vector>
 #include <unordered_map>
 
-struct dir
-{
-	std::string dir;
-	bool sudo;
-};
-
 struct lnk
 {
 	std::string src;
@@ -37,8 +31,13 @@ struct lnk_block
 class Config
 {
 	std::unordered_map< std::string, std::vector< std::string > > m_env_vars;
-	std::vector< dir > m_dirs;
+
+	std::vector< std::string > m_dirs;
+	std::vector< std::string > m_dirs_sudo;
+
 	std::vector< lnk_block > m_lnks;
+	std::vector< lnk_block > m_lnks_sudo;
+
 	std::vector< std::string > m_final_cmds;
 public:
 	bool LoadConfig( const std::string & file_name );

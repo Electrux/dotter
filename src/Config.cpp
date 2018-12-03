@@ -49,31 +49,32 @@ bool Config::LoadConfig( const std::string & file_name )
 
 	// Now, fetch the directories to be created
 	if( conf[ "dirs" ] ) {
-		dir di;
-		for( auto dirs : conf[ "dirs" ] ) {
-			for( auto d : dirs ) {
-				di.dir = d.as< std::string >();
-				di.sudo = false;
-			}
+		for( auto dir : conf[ "dirs" ] ) {
+			m_dirs.push_back( dir.as< std::string >() );
 		}
 	}
 	// sudo directories
 	if( conf[ "dirs_sudo" ] ) {
-		for( auto dirs : conf[ "dirs_sudo" ] ) {
-			dir di;
-			for( auto d : dirs ) {
-				di.dir = d.as< std::string >();
-				di.sudo = true;
-			}
-			m_dirs.push_back( di );
+		for( auto dir : conf[ "dirs_sudo" ] ) {
+			m_dirs_sudo.push_back( dir.as< std::string >() );
 		}
 	}
 	std::cout << "Info: Loaded " << m_dirs.size() << " required directories!\n";
+	std::cout << "Info: Loaded " << m_dirs_sudo.size() << " required directories that need sudo!\n";
 
 	// Now, retrieve the links and sudo links
 	FetchLnks( conf, "lnk", m_lnks );
-	FetchLnks( conf, "lnk_sudo", m_lnks );
-	std::cout << "Info: Loaded " << m_lnks.size() << " links!\n";
+	FetchLnks( conf, "lnk_sudo", m_lnks_sudo );
+
+#ifdef __DEBUG__
+	std::cout << "Links:\n";
+	for( auto & lnk_blk : m_lnks ) {
+		std::cout << "=> Block: " << lnk_blk.prefix_src << ", " << lnk_blk.prefix_dest << "\n";
+		for( auto & lnk : lnk_blk.lnks ) {
+			std::cout << "===> " << lnk.src << " -> " << lnk.dest << "\n";
+		}
+	}
+#endif
 
 	// Fetch the post link commands
 	if( conf[ "post_lnk_cmds" ] ) {
@@ -120,7 +121,7 @@ static void FetchLnks( YAML::Node & conf, const std::string & conf_key, std::vec
 	if( conf[ conf_key ] ) {
 		lnk_block tmp_blk;
 		bool finished_block = false;
-		for( auto l : conf[ "lnk" ] ) {
+		for( auto l : conf[ conf_key ] ) {
 			if( l.IsMap() ) {
 				auto m = l.begin();
 				std::string key = m->first.as< std::string >();
@@ -140,7 +141,7 @@ static void FetchLnks( YAML::Node & conf, const std::string & conf_key, std::vec
 						tmp_blk.prefix_src = prefix[ 0 ];
 					}
 					if( prefix.size() > 1 ) {
-						tmp_blk.prefix_src = prefix[ 1 ];
+						tmp_blk.prefix_dest = prefix[ 1 ];
 					}
 					finished_block = true;
 					continue;
@@ -157,4 +158,15 @@ static void FetchLnks( YAML::Node & conf, const std::string & conf_key, std::vec
 			m_lnks.push_back( tmp_blk );
 		}
 	}
+	std::cout << "Info: Loaded " << m_lnks.size() << " link block(s)";
+	if( m_lnks.size() > 0 ) {
+		std::cout << " with a total of ";
+		int lnks = 0;
+		for( auto & lnk_blk : m_lnks ) {
+			lnks += lnk_blk.lnks.size();
+		}
+		std::cout << lnks << " links";
+	}
+	if( conf_key == "lnk_sudo" ) std::cout << " that need sudo";
+	std::cout << "!\n";
 }
