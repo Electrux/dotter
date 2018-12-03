@@ -8,14 +8,9 @@
 	before using or altering the project.
 */
 
-#ifndef INFO_HPP
-#define INFO_HPP
+#ifndef SELF_CONFIG_HPP
+#define SELF_CONFIG_HPP
 
-#include <string>
 
-const std::string & SelfConfigFile();
-const std::string & WorkspaceLoc();
-std::string ConfigFile( const bool use_platform = false );
-const std::string & Platform();
 
-#endif // INFO_HPP
+#endif // SELF_CONFIG_HPP

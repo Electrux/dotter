@@ -16,7 +16,7 @@
 
 #include "../include/Info.hpp"
 
-static const std::string GetHomeDir()
+static std::string GetHomeDir()
 {
 	static const char * homedir = nullptr;
 	if( homedir != nullptr ) return homedir;
@@ -37,4 +37,26 @@ const std::string & WorkspaceLoc()
 {
 	static const std::string loc = GetHomeDir() + "/.dott";
 	return loc;
+}
+
+std::string ConfigFile( const bool use_platform )
+{
+	std::string conf_file = "dott";
+	if( use_platform ) conf_file +=  "_" + Platform();
+	conf_file += ".yaml";
+	return conf_file;
+}
+
+const std::string & Platform()
+{
+	static const std::string platform = 
+#ifdef __linux__
+		"linux"
+#elif __APPLE__
+		"osx"
+#else
+		"other"
+#endif
+	;
+	return platform;
 }

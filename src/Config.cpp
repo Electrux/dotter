@@ -19,6 +19,8 @@
 #include "../include/Env.hpp"
 #include "../include/Config.hpp"
 
+static void FetchLnks( YAML::Node & conf, const std::string & conf_key, std::vector< lnk_block > & m_lnks );
+
 bool Config::LoadConfig( const std::string & file_name )
 {
 	if( !FS::LocExists( file_name ) ) {
@@ -38,12 +40,49 @@ bool Config::LoadConfig( const std::string & file_name )
 				key = m->first.as< std::string >();
 				val = Str::Delimit( m->second.as< std::string >(), ';' );
 			} else {
-				std::cerr << "Else: " << v.as< std::string >() << "\n";
 				key = v.as< std::string >();
 			}
 			m_env_vars[ key ] = val;
 		}
 	}
+	std::cout << "Info: Loaded " << m_env_vars.size() << " env vars!\n";
+
+	// Now, fetch the directories to be created
+	if( conf[ "dirs" ] ) {
+		dir di;
+		for( auto dirs : conf[ "dirs" ] ) {
+			for( auto d : dirs ) {
+				di.dir = d.as< std::string >();
+				di.sudo = false;
+			}
+		}
+	}
+	// sudo directories
+	if( conf[ "dirs_sudo" ] ) {
+		for( auto dirs : conf[ "dirs_sudo" ] ) {
+			dir di;
+			for( auto d : dirs ) {
+				di.dir = d.as< std::string >();
+				di.sudo = true;
+			}
+			m_dirs.push_back( di );
+		}
+	}
+	std::cout << "Info: Loaded " << m_dirs.size() << " required directories!\n";
+
+	// Now, retrieve the links and sudo links
+	FetchLnks( conf, "lnk", m_lnks );
+	FetchLnks( conf, "lnk_sudo", m_lnks );
+	std::cout << "Info: Loaded " << m_lnks.size() << " links!\n";
+
+	// Fetch the post link commands
+	if( conf[ "post_lnk_cmds" ] ) {
+		for( auto lnk : conf[ "post_lnk_cmds" ] ) {
+			m_final_cmds.push_back( lnk.as< std::string >() );
+		}
+	}
+	std::cout << "Info: Loaded " << m_final_cmds.size() << " post link commands!\n";
+
 	return true;
 }
 
@@ -57,20 +96,65 @@ bool Config::CheckEnvVars()
 {
 	if( m_env_vars.empty() ) return true;
 	for( auto & v : m_env_vars ) {
-		std::cout << "Is set environment variable: '" << v.first << "' ... ";
+		std::cerr << "Is set environment variable: '" << v.first << "' ... ";
 		std::string val = Env::GetVarVal( v.first );
 
 		if( val.empty() ) {
-			std::cout << "No\n";
+			std::cerr << "No\n";
 			return false;
 		}
 
-		std::cout << "Yes";
+		std::cerr << "Yes";
 		if( !v.second.empty() ) {
 			int pos = Str::IsOneOf( v.second, val );
-			std::cout << " (" << pos << ")\n";
+			std::cerr << " (" << pos << ")\n";
 			if( pos < 0 ) return false;
 		}
+		std::cerr << "\n";
 	}
 	return true;
+}
+
+static void FetchLnks( YAML::Node & conf, const std::string & conf_key, std::vector< lnk_block > & m_lnks )
+{
+	if( conf[ conf_key ] ) {
+		lnk_block tmp_blk;
+		bool finished_block = false;
+		for( auto l : conf[ "lnk" ] ) {
+			if( l.IsMap() ) {
+				auto m = l.begin();
+				std::string key = m->first.as< std::string >();
+				if( key == "prefix_" ) {
+					if( finished_block ) {
+						if( !tmp_blk.lnks.empty() ) {
+							m_lnks.push_back( tmp_blk );
+
+							tmp_blk.prefix_src.clear();
+							tmp_blk.prefix_dest.clear();
+							tmp_blk.lnks.clear();
+						}
+						finished_block = false;
+					}
+					auto prefix = m->second.as< std::vector< std::string > >();
+					if( prefix.size() > 0 ) {
+						tmp_blk.prefix_src = prefix[ 0 ];
+					}
+					if( prefix.size() > 1 ) {
+						tmp_blk.prefix_src = prefix[ 1 ];
+					}
+					finished_block = true;
+					continue;
+				}
+				auto & src = key;
+				auto dest = m->second.as< std::string >();
+				tmp_blk.lnks.push_back( { src, dest } );
+				continue;
+			}
+			auto loc = l.as< std::string >();
+			tmp_blk.lnks.push_back( { loc, loc } );
+		}
+		if( !tmp_blk.lnks.empty() ) {
+			m_lnks.push_back( tmp_blk );
+		}
+	}
 }

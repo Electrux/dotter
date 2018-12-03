@@ -8,14 +8,15 @@
 	before using or altering the project.
 */
 
-#ifndef INFO_HPP
-#define INFO_HPP
+#ifndef DOTTER_USE_HPP
+#define DOTTER_USE_HPP
 
 #include <string>
+#include <vector>
 
-const std::string & SelfConfigFile();
-const std::string & WorkspaceLoc();
-std::string ConfigFile( const bool use_platform = false );
-const std::string & Platform();
+namespace Dot
+{
+	int Use( const std::vector< std::string > & args );
+}
 
-#endif // INFO_HPP
+#endif // DOTTER_USE_HPP

@@ -13,16 +13,19 @@
 #include <vector>
 
 #include "../../include/Dotter/Get.hpp"
+#include "../../include/Dotter/Use.hpp"
 #include "../../include/Dotter/Handler.hpp"
 
 int Dot::Handle( const std::vector< std::string > & args )
 {
 	if( args.size() < 2 ) {
-		std::cout << "Usage: " << args[ 0 ] << " [get]\n";
+		std::cout << "Usage: " << args[ 0 ] << " [get/use]\n";
 		return -1;
 	}
 	if( args[ 1 ] == "get" ) {
 		return Dot::Get( args );
+	} else if( args[ 1 ] == "use" ) {
+		return Dot::Use( args );
 	}
 	return 0;
 }

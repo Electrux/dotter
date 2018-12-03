@@ -15,9 +15,31 @@
 #include <vector>
 #include <unordered_map>
 
+struct dir
+{
+	std::string dir;
+	bool sudo;
+};
+
+struct lnk
+{
+	std::string src;
+	std::string dest;
+};
+
+struct lnk_block
+{
+	std::string prefix_src;
+	std::string prefix_dest;
+	std::vector< lnk > lnks;
+};
+
 class Config
 {
 	std::unordered_map< std::string, std::vector< std::string > > m_env_vars;
+	std::vector< dir > m_dirs;
+	std::vector< lnk_block > m_lnks;
+	std::vector< std::string > m_final_cmds;
 public:
 	bool LoadConfig( const std::string & file_name );
 

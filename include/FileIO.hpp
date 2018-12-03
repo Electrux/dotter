@@ -22,6 +22,11 @@ namespace FS
 	{
 		return fs::exists( loc );
 	}
+
+	inline bool CreateDir( const std::string & loc )
+	{
+		return fs::create_directories( loc );
+	}
 }
 
 #endif // FILE_IO_HPP
