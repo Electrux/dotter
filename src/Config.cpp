@@ -48,7 +48,7 @@ bool Config::LoadConfig( const std::string & file_name )
 	}
 	std::cout << "Info: Loaded " << m_env_vars.size() << " env vars!\n";
 
-	// Now, fetch the directories to be created
+	// Now, fetch the directories and sudo directories to be created
 	FetchDirs( conf, "dirs", m_dirs );
 	FetchDirs( conf, "dirs_sudo", m_dirs_sudo );
 
