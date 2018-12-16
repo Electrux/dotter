@@ -99,5 +99,15 @@ builds:
       - src/(.*).cpp
     exclude:
       - src/main.cpp
+  - name: Env_ExpandPath
+    type: test
+    inc_flags: ""
+    lib_flags: ""
+    pre_exec: ""
+    main_src: tests/Env_ExpandPath.cpp
+    other_src:
+      - src/(.*).cpp
+    exclude:
+      - src/main.cpp
 env:
   []

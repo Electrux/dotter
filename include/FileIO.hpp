@@ -14,6 +14,8 @@
 #include <string>
 #include <filesystem>
 
+#include "Env.hpp"
+
 namespace fs = std::__fs::filesystem;
 
 namespace FS
@@ -25,7 +27,12 @@ namespace FS
 
 	inline bool CreateDir( const std::string & loc )
 	{
-		return fs::create_directories( loc );
+		return !Env::Exec( "mkdir -p " + loc );
+	}
+
+	inline bool CreateDirSudo( const std::string & loc )
+	{
+		return !Env::Exec( "sudo mkdir -p " + loc );
 	}
 }
 

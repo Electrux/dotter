@@ -30,6 +30,8 @@ struct lnk_block
 
 class Config
 {
+	std::string m_dir_repo;
+
 	std::unordered_map< std::string, std::vector< std::string > > m_env_vars;
 
 	std::vector< std::string > m_dirs;
@@ -40,12 +42,20 @@ class Config
 
 	std::vector< std::string > m_final_cmds;
 public:
-	bool LoadConfig( const std::string & file_name );
+	bool LoadConfig( const std::string & file_name, const std::string & dir_repo = "" );
 
 	const std::unordered_map< std::string, std::vector< std::string > > &
 	GetEnvVars();
 
 	bool CheckEnvVars();
+
+	bool ValidateDirectories();
+
+	bool LnksExist();
+
+	bool InstallLnks();
+
+	bool PerfPostLnkCmds();
 };
 
 #endif // CONFIG_HPP

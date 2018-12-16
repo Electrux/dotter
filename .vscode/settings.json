@@ -34,6 +34,8 @@
 		"array": "cpp",
 		"cstdint": "cpp",
 		"optional": "cpp",
-		"vector": "cpp"
+		"vector": "cpp",
+		"atomic": "cpp",
+		"memory_resource": "cpp"
 	}
 }

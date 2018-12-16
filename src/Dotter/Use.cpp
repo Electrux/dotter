@@ -20,7 +20,7 @@
 #include "../../include/Config.hpp"
 #include "../../include/Dotter/Use.hpp"
 
-static int InstallRepo( const std::vector< std::string > & args, const std::string & config_file );
+static int InstallRepo( const std::vector< std::string > & args, const std::string & dir_repo, const std::string & config_file );
 
 int Dot::Use( const std::vector< std::string > & args )
 {
@@ -31,34 +31,60 @@ int Dot::Use( const std::vector< std::string > & args )
 
 	std::string dir_repo = args[ 2 ];
 	std::replace( dir_repo.begin(), dir_repo.end(), '/', '_' );
+	dir_repo = WorkspaceLoc() + "/" + dir_repo;
 
-	if( !FS::LocExists( WorkspaceLoc() + "/" + dir_repo ) ) {
+	if( !FS::LocExists( dir_repo ) ) {
 		std::cerr << "Error: The repository doesn't exist! Use the 'use' argument to download repositories!\n";
 		return -3;
 	}
 
-	std::string config_file = WorkspaceLoc() + "/" + dir_repo + "/" + ConfigFile( true );
+	std::string config_file = dir_repo + "/" + ConfigFile( true );
 	bool is_generic_conf = false;
-	std::cout << "Info: Attempting to find OS specific config file ...\n";
+	std::cout << "Info: Finding OS specific config file ... ";
 	if( !FS::LocExists( config_file ) ) {
-		std::cout << "Info: Couldn't find OS specific config file, attempting to find generic config ...\n";
-		config_file = WorkspaceLoc() + "/" + dir_repo + "/" + ConfigFile();
+		std::cout << "Failed ... Finding generic config ... ";
+		config_file = dir_repo + "/" + ConfigFile();
 		is_generic_conf = true;
 		if( !FS::LocExists( config_file ) ) {
-			std::cerr << "Error: No generic config found! Nothing to work with!\n";
+			std::cout << "Failed\n";
+			std::cerr << "Error: No configuration file found! Cannot continue!\n";
 			return 1;
 		}
-		std::cout << "Info: Found generic config file! Using it!\n";
 	}
+	std::cout << "Success\n";
 
-	return InstallRepo( args, config_file );
+	return InstallRepo( args, dir_repo, config_file );
 }
 
-static int InstallRepo( const std::vector< std::string > & args, const std::string & config_file )
+static int InstallRepo( const std::vector< std::string > & args, const std::string & dir_repo, const std::string & config_file )
 {
 	Config conf;
-	if( !conf.LoadConfig( config_file ) ) {
+	if( !conf.LoadConfig( config_file, dir_repo ) ) {
 		std::cerr << "Error: Failed loading the config file: " << config_file << "! Cannot continue!\n";
+		return -3;
+	}
+
+	if( !conf.CheckEnvVars() ) {
+		std::cerr << "Error: Unmet required environment variables! Cannot continue!\n";
+		return -3;
+	}
+
+	if( !conf.ValidateDirectories() ) {
+		std::cerr << "Error: Unmet required directories! Cannot continue!\n";
+		return -3;
+	}
+
+	if( !conf.LnksExist() ) {
+		std::cerr << "Error: Required source links do not exist! Cannot continue!\n";
+		return -3;
+	}
+
+	if( !conf.InstallLnks() ) {
+		std::cerr << "Error: Unable to install links! Cannot continue!\n";
+		return -3;
+	}
+	if( !conf.PerfPostLnkCmds() ) {
+		std::cerr << "Error: Failed to perform post link commands! Cannot continue!\n";
 		return -3;
 	}
 

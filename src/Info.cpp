@@ -14,28 +14,18 @@
 #include <sys/types.h>
 #include <pwd.h>
 
+#include "../include/Env.hpp"
 #include "../include/Info.hpp"
-
-static std::string GetHomeDir()
-{
-	static const char * homedir = nullptr;
-	if( homedir != nullptr ) return homedir;
-
-	if( ( homedir = getenv( "HOME" ) ) == nullptr ) {
-		homedir = getpwuid( getuid() )->pw_dir;
-	}
-	return homedir;
-}
 
 const std::string & SelfConfigFile()
 {
-	static const std::string loc = GetHomeDir() + "/.dottcfg.yaml";
+	static const std::string loc = Env::ExpandPathConst( "~/.dottcfg.yaml" );
 	return loc;
 }
 
 const std::string & WorkspaceLoc()
 {
-	static const std::string loc = GetHomeDir() + "/.dott";
+	static const std::string loc = Env::ExpandPathConst( "~/.dott" );
 	return loc;
 }
 

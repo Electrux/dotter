@@ -18,6 +18,8 @@ namespace Env
 	const std::string GetVarVal( const std::string & var );
 	bool CmdExistsInPath( const std::string & cmd );
 	int Exec( const std::string & cmd );
+	const std::string & ExpandPath( std::string & path );
+	std::string ExpandPathConst( std::string path );
 }
 
 #endif // ENV_HPP

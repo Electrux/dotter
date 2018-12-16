@@ -10,6 +10,7 @@
 
 #include <string>
 #include <cstdlib>
+#include <wordexp.h>
 
 #include "../include/Strings.hpp"
 #include "../include/FileIO.hpp"
@@ -37,4 +38,21 @@ bool Env::CmdExistsInPath( const std::string & cmd )
 int Env::Exec( const std::string & cmd )
 {
 	return std::system( cmd.c_str() );
+}
+
+const std::string & Env::ExpandPath( std::string & path )
+{
+	wordexp_t p;
+	char ** w;
+	wordexp( path.c_str(), & p, 0 );
+	path.clear();
+	w = p.we_wordv;
+	for( size_t i = 0; i < p.we_wordc; ++i ) path += w[ i ];
+	wordfree( & p );
+	return path;
+}
+
+std::string Env::ExpandPathConst( std::string path )
+{
+	return ExpandPath( path );
 }
