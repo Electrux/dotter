@@ -32,6 +32,8 @@ void Core::DebugMode( const bool debug_mode )
 
 bool Core::Init()
 {
+	Core::DebugMode( false );
+
 	if( !FS::LocExists( WorkspaceLoc() ) && Env::Exec( "mkdir -p " + WorkspaceLoc() ) != 0 ) {
 		std::cerr << "mkdir failed for workspace location: " << WorkspaceLoc() << "\n";
 		return false;
