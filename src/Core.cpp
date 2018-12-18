@@ -19,6 +19,17 @@
 #include "../include/FileIO.hpp"
 #include "../include/Core.hpp"
 
+bool Core::n_debug_mode = false;
+
+bool Core::DebugMode()
+{
+	return n_debug_mode;
+}
+void Core::DebugMode( const bool debug_mode )
+{
+	n_debug_mode = debug_mode;
+}
+
 bool Core::Init()
 {
 	if( !FS::LocExists( WorkspaceLoc() ) && Env::Exec( "mkdir -p " + WorkspaceLoc() ) != 0 ) {
@@ -34,6 +45,8 @@ bool Core::Init()
 		std::ofstream cfgfile( SelfConfigFile() );
 		cfgfile << cfg;
 	}
+
+	Core::DebugMode( !Env::GetVarVal( "DEBUG_MODE" ).empty() );
 
 	return true;
 }

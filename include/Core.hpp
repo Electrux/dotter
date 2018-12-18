@@ -16,6 +16,9 @@
 
 namespace Core
 {
+	extern bool n_debug_mode;
+	bool DebugMode();
+	void DebugMode( const bool debug_mode );
 	bool Init();
 }
 

@@ -8,10 +8,12 @@
 	before using or altering the project.
 */
 
+#include <iostream>
 #include <string>
 #include <cstdlib>
 #include <wordexp.h>
 
+#include "../include/Core.hpp"
 #include "../include/Strings.hpp"
 #include "../include/FileIO.hpp"
 #include "../include/Env.hpp"
@@ -37,6 +39,10 @@ bool Env::CmdExistsInPath( const std::string & cmd )
 
 int Env::Exec( const std::string & cmd )
 {
+	if( Core::DebugMode() ) {
+		std::cout << "\n## Command: " << cmd << "\n";
+		return 0;
+	}
 	return std::system( cmd.c_str() );
 }
 
