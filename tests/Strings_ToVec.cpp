@@ -12,7 +12,7 @@
 
 int main()
 {
-	char * argv[] = { "Hello", "World", "You", "Are", "Big" };
+	const char * argv[] = { "Hello", "World", "You", "Are", "Big" };
 	int argc = 5;
 	auto args = Str::ToVec( argc, ( const char ** )argv );
 	assert( args.size() == 5 );
